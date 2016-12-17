@@ -1,0 +1,80 @@
+/* Abhinav Rana
+  * U06971709
+  * Anna Kaplan 
+  * A99039352
+  * HCTree.h
+*/
+#ifndef HCTREE_H
+#define HCTREE_H
+#include <queue>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include "HCNode.h"
+#include "BitInputStream.h"
+#include "BitOutputStream.h"
+using namespace std;
+
+/** A 'function class' for use as the Compare class in a
+ *  priority_queue<HCNode*>.
+ *  For this to work, operator< must be defined to
+ *  do the right thing on HCNodes.
+ */
+class HCNodePtrComp {
+public:
+    bool operator()(HCNode*& lhs, HCNode*& rhs) const {
+        return *lhs < *rhs;
+    }
+};
+
+/** A Huffman Code Tree class.
+ *  Not very generic:  Use only if alphabet consists
+ *  of unsigned chars.
+ */
+class HCTree {
+
+private:
+    HCNode* root;
+    vector<HCNode*> leaves;
+    std::priority_queue<HCNode*,std::vector<HCNode*>,HCNodePtrComp> minHeap;
+    void deleteAll(HCNode*);
+
+public:
+
+    // explicit keyword is used to avoid accidental implicit conversions
+    explicit HCTree() : root(0) {
+        leaves = vector<HCNode*>(256, (HCNode*) 0);
+    }
+
+    ~HCTree();
+
+    /** Use the Huffman algorithm to build a Huffman coding trie.
+     *  PRECONDITION: freqs is a vector of ints, such that freqs[i] is 
+     *  the frequency of occurrence of byte i in the message.
+     *  POSTCONDITION:  root points to the root of the trie,
+     *  and leaves[i] points to the leaf node containing byte i.
+     */
+    void build(const vector<int>&);
+
+    /** Write to the given BitOutputStream
+     *  the sequence of bits coding the given symbol.
+     *  PRECONDITION: build() has been called, to create the coding
+     *  tree, and initialize root pointer and leaves vector.
+     */
+    
+    void encode(byte, BitOutputStream&) const;
+
+    
+
+
+    /** Return symbol coded in the next sequence of bits from the stream.
+     *  PRECONDITION: build() has been called, to create the coding
+     *  tree, and initialize root pointer and leaves vector.
+     */
+    int decode(BitInputStream&) const;
+
+   
+
+};
+
+#endif // HCTREE_H
